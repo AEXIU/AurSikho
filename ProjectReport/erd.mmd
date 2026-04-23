@@ -1,0 +1,66 @@
+erDiagram
+    USER {
+        int id PK
+        string username
+        string email
+        string role
+        string password_hash
+        string full_name
+        datetime created_at
+    }
+    COURSE {
+        int id PK
+        string title
+        string description
+        string category
+        string difficulty
+        boolean is_published
+        int instructor_id FK
+    }
+    LESSON {
+        int id PK
+        string title
+        string lesson_type
+        string video_url
+        string content
+        int duration_minutes
+        int course_id FK
+    }
+    QUIZ {
+        int id PK
+        string title
+        int passing_score
+        int course_id FK
+    }
+    QUIZ_QUESTION {
+        int id PK
+        string question_text
+        string option_a
+        string option_b
+        string option_c
+        string option_d
+        string correct_answer
+        int quiz_id FK
+    }
+    ENROLLMENT {
+        int id PK
+        boolean completed
+        datetime enrolled_at
+        int student_id FK
+        int course_id FK
+    }
+    CERTIFICATE {
+        int id PK
+        string certificate_uid
+        datetime issued_at
+        int student_id FK
+        int course_id FK
+    }
+
+    USER ||--o{ COURSE : "teaches"
+    USER ||--o{ ENROLLMENT : "has"
+    COURSE ||--o{ LESSON : "contains"
+    COURSE ||--o| QUIZ : "has"
+    COURSE ||--o{ ENROLLMENT : "receives"
+    QUIZ ||--o{ QUIZ_QUESTION : "contains"
+    ENROLLMENT ||--o| CERTIFICATE : "earns"

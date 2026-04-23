@@ -1,0 +1,38 @@
+flowchart LR
+    subgraph Users
+        Student((Student))
+        Instructor((Instructor))
+        Admin((Admin))
+    end
+
+    subgraph AurSikho System
+        Auth(Register/Login)
+        Browse(Browse Courses)
+        Enroll(Enroll in Courses)
+        Learn(Watch Hybrid Lessons)
+        Quiz(Attempt Quizzes)
+        Cert(Download Certificate)
+        
+        Create(Create/Publish Courses)
+        ManageL(Manage Lessons)
+        Track(Track Student Progress)
+        
+        ManageU(Manage Users)
+        Stats(Monitor Stats)
+    end
+
+    Student --> Auth
+    Student --> Browse
+    Student --> Enroll
+    Student --> Learn
+    Student --> Quiz
+    Student --> Cert
+
+    Instructor --> Auth
+    Instructor --> Create
+    Instructor --> ManageL
+    Instructor --> Track
+
+    Admin --> Auth
+    Admin --> ManageU
+    Admin --> Stats

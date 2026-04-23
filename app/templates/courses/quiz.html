@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="quiz-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="quiz-card">
+                    <div class="quiz-header">
+                        <a href="{{ url_for('courses.detail', course_id=course.id) }}" class="btn btn-sm btn-outline-secondary mb-3">
+                            <i class="bi bi-arrow-left"></i> Back to Course
+                        </a>
+                        <h2><i class="bi bi-clipboard-check"></i> {{ quiz.title }}</h2>
+                        <p class="text-muted">{{ quiz.total_questions }} questions · {{ quiz.passing_score }}% required to pass</p>
+                    </div>
+
+                    <!-- Previous Attempt Result -->
+                    {% if previous_attempt %}
+                    <div class="alert alert-{% if previous_attempt.passed %}success{% else %}warning{% endif %} mt-3">
+                        <strong>Last Attempt:</strong> You scored {{ previous_attempt.score }}%
+                        {% if previous_attempt.passed %}
+                        — <i class="bi bi-check-circle-fill"></i> Passed!
+                        {% else %}
+                        — You need {{ quiz.passing_score }}% to pass. Try again!
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if not previous_attempt or not previous_attempt.passed %}
+                    <!-- Quiz Form -->
+                    <form method="POST" action="{{ url_for('courses.submit_quiz', course_id=course.id, quiz_id=quiz.id) }}" id="quizForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        {% for question in questions %}
+                        <div class="question-card">
+                            <h5 class="question-number">Question {{ loop.index }}</h5>
+                            <p class="question-text">{{ question.question_text }}</p>
+
+                            <div class="options-list">
+                                <label class="option-item">
+                                    <input type="radio" name="question_{{ question.id }}" value="a" required>
+                                    <span class="option-label">A</span>
+                                    <span class="option-text">{{ question.option_a }}</span>
+                                </label>
+                                <label class="option-item">
+                                    <input type="radio" name="question_{{ question.id }}" value="b">
+                                    <span class="option-label">B</span>
+                                    <span class="option-text">{{ question.option_b }}</span>
+                                </label>
+                                <label class="option-item">
+                                    <input type="radio" name="question_{{ question.id }}" value="c">
+                                    <span class="option-label">C</span>
+                                    <span class="option-text">{{ question.option_c }}</span>
+                                </label>
+                                <label class="option-item">
+                                    <input type="radio" name="question_{{ question.id }}" value="d">
+                                    <span class="option-label">D</span>
+                                    <span class="option-text">{{ question.option_d }}</span>
+                                </label>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <div class="quiz-submit mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-send"></i> Submit Quiz
+                            </button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <!-- Already passed -->
+                    <div class="text-center mt-4">
+                        <i class="bi bi-trophy-fill text-warning" style="font-size: 3rem;"></i>
+                        <h4 class="mt-3">You've already passed this quiz!</h4>
+                        <p>Go back to the course page to generate your certificate.</p>
+                        <a href="{{ url_for('courses.detail', course_id=course.id) }}" class="btn btn-primary">
+                            <i class="bi bi-arrow-left"></i> Back to Course
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

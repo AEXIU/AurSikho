@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="dashboard-section">
+    <div class="container">
+        <a href="{{ url_for('instructor.manage_course', course_id=course.id) }}" class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left"></i> Back to {{ course.title }}
+        </a>
+        <div class="form-card">
+            <h2>{% if is_edit %}Edit Lesson{% else %}Add Lesson{% endif %}</h2>
+            <p class="text-muted">Course: {{ course.title }}</p>
+            <form method="POST" class="mt-4">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    <label for="title" class="form-label">{{ form.title.label.text }}</label>
+                    {{ form.title(class="form-control", id="title", placeholder="e.g., Introduction to Variables") }}
+                    {% for error in form.title.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="mb-3">
+                    <label for="lesson_type" class="form-label">{{ form.lesson_type.label.text }}</label>
+                    {{ form.lesson_type(class="form-select", id="lesson_type") }}
+                </div>
+                <div class="mb-3">
+                    <label for="video_url" class="form-label">{{ form.video_url.label.text }}</label>
+                    {{ form.video_url(class="form-control", id="video_url", placeholder="https://www.youtube.com/watch?v=...") }}
+                    <small class="form-text text-muted">Paste a YouTube video URL</small>
+                </div>
+                <div class="mb-3">
+                    <label for="content" class="form-label">{{ form.content.label.text }}</label>
+                    {{ form.content(class="form-control", id="content", rows="5", placeholder="Additional notes or text content for this lesson") }}
+                </div>
+                <div class="mb-3">
+                    <label for="duration_minutes" class="form-label">{{ form.duration_minutes.label.text }}</label>
+                    {{ form.duration_minutes(class="form-control", id="duration_minutes", placeholder="e.g., 15") }}
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-check-circle"></i> {{ 'Update Lesson' if is_edit else 'Add Lesson' }}
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

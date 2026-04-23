@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="dashboard-section">
+    <div class="container">
+        <div class="dashboard-header">
+            <h1><i class="bi bi-speedometer2"></i> My Dashboard</h1>
+            <p>Welcome back, {{ current_user.full_name }}!</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <ul class="nav nav-pills dashboard-tabs mb-4" id="dashboardTabs">
+            <li class="nav-item">
+                <a class="nav-link {% if not show_certificates|default(false) %}active{% endif %}" href="{{ url_for('student.dashboard') }}">
+                    <i class="bi bi-book"></i> My Courses
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if show_certificates|default(false) %}active{% endif %}" href="{{ url_for('student.certificates') }}">
+                    <i class="bi bi-award"></i> My Certificates
+                </a>
+            </li>
+        </ul>
+
+        {% if show_certificates|default(false) %}
+        <!-- Certificates View -->
+        {% if certificates %}
+        <div class="row g-4">
+            {% for cert in certificates %}
+            <div class="col-md-6 col-lg-4">
+                <div class="certificate-card">
+                    <div class="cert-icon"><i class="bi bi-award-fill"></i></div>
+                    <h5>{{ cert.course.title }}</h5>
+                    <p class="text-muted small">Issued: {{ cert.issued_at.strftime('%B %d, %Y') }}</p>
+                    <p class="cert-uid small">ID: {{ cert.certificate_uid[:8] }}...</p>
+                    <div class="cert-actions">
+                        <a href="{{ url_for('certificate.view', uid=cert.certificate_uid) }}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-eye"></i> View
+                        </a>
+                        <a href="{{ url_for('certificate.download', uid=cert.certificate_uid) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-download"></i> Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-award"></i>
+            <h4>No certificates yet</h4>
+            <p>Complete a course to earn your first certificate!</p>
+            <a href="{{ url_for('main.browse') }}" class="btn btn-primary">Browse Courses</a>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- Courses View -->
+
+        <!-- Active Courses -->
+        {% if active_enrollments %}
+        <h4 class="mb-3"><i class="bi bi-play-circle"></i> In Progress</h4>
+        <div class="row g-4 mb-5">
+            {% for enrollment in active_enrollments %}
+            <div class="col-md-6 col-lg-4">
+                <div class="course-card enrolled-card">
+                    <div class="course-card-header">
+                        <div class="course-category-badge">{{ enrollment.course.category }}</div>
+                    </div>
+                    <div class="course-card-body">
+                        <h5 class="course-title">{{ enrollment.course.title }}</h5>
+                        <p class="text-muted small">by {{ enrollment.course.instructor.full_name }}</p>
+                        <div class="progress mt-3" style="height: 8px;">
+                            <div class="progress-bar bg-primary" style="width: {{ enrollment.progress_percentage }}%"></div>
+                        </div>
+                        <p class="mt-2 small text-muted">{{ enrollment.progress_percentage }}% complete</p>
+                    </div>
+                    <div class="course-card-footer">
+                        <a href="{{ url_for('courses.detail', course_id=enrollment.course.id) }}" class="btn btn-sm btn-primary">
+                            Continue <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Completed Courses -->
+        {% if completed_enrollments %}
+        <h4 class="mb-3"><i class="bi bi-check-circle"></i> Completed</h4>
+        <div class="row g-4">
+            {% for enrollment in completed_enrollments %}
+            <div class="col-md-6 col-lg-4">
+                <div class="course-card completed-card">
+                    <div class="course-card-header">
+                        <div class="course-category-badge">{{ enrollment.course.category }}</div>
+                        <span class="badge bg-success">Completed</span>
+                    </div>
+                    <div class="course-card-body">
+                        <h5 class="course-title">{{ enrollment.course.title }}</h5>
+                        <p class="text-muted small">by {{ enrollment.course.instructor.full_name }}</p>
+                        <div class="progress mt-3" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="course-card-footer">
+                        {% if enrollment.certificate %}
+                        <a href="{{ url_for('certificate.view', uid=enrollment.certificate.certificate_uid) }}" class="btn btn-sm btn-success">
+                            <i class="bi bi-award"></i> View Certificate
+                        </a>
+                        {% elif enrollment.can_get_certificate %}
+                        <form method="POST" action="{{ url_for('certificate.generate', enrollment_id=enrollment.id) }}" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-success">
+                                <i class="bi bi-award"></i> Get Certificate
+                            </button>
+                        </form>
+                        {% else %}
+                        <a href="{{ url_for('courses.detail', course_id=enrollment.course.id) }}" class="btn btn-sm btn-outline-primary">
+                            Pass Quiz to Get Certificate
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if not active_enrollments and not completed_enrollments %}
+        <div class="empty-state">
+            <i class="bi bi-book"></i>
+            <h4>No enrollments yet</h4>
+            <p>Start your learning journey by enrolling in a course!</p>
+            <a href="{{ url_for('main.browse') }}" class="btn btn-primary">Browse Courses</a>
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

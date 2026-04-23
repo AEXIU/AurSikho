@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="dashboard-section">
+    <div class="container">
+        <a href="{{ url_for('instructor.manage_course', course_id=course.id) }}" class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left"></i> Back to {{ course.title }}
+        </a>
+        <div class="form-card">
+            <h2>Create Quiz</h2>
+            <p class="text-muted">Course: {{ course.title }}</p>
+            <form method="POST" class="mt-4">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    <label for="title" class="form-label">{{ form.title.label.text }}</label>
+                    {{ form.title(class="form-control", id="title", placeholder="e.g., Final Assessment") }}
+                    {% for error in form.title.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="mb-3">
+                    <label for="passing_score" class="form-label">{{ form.passing_score.label.text }}</label>
+                    {{ form.passing_score(class="form-control", id="passing_score") }}
+                    <small class="form-text text-muted">Students need this percentage to pass (1-100)</small>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-check-circle"></i> Create Quiz
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

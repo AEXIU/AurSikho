@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+*.pyc
+.env
+.DS_Store
+uploads/
+app/static/certificates/*.png
+!app/static/certificates/premium_cert_template_*.png
+!app/static/certificates/base.png

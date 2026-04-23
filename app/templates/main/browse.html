@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1><i class="bi bi-compass"></i> Browse Courses</h1>
+        <p>Discover courses that match your interests and skill level</p>
+    </div>
+</section>
+
+<section class="browse-section">
+    <div class="container">
+        <!-- Search & Filters -->
+        <div class="filter-bar">
+            <form method="GET" action="{{ url_for('main.browse') }}" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label for="searchInput" class="form-label">Search</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" name="search" id="searchInput"
+                               value="{{ search }}" placeholder="Search courses...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label for="categoryFilter" class="form-label">Category</label>
+                    <select name="category" id="categoryFilter" class="form-select">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}" {% if cat == current_category %}selected{% endif %}>{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="difficultyFilter" class="form-label">Difficulty</label>
+                    <select name="difficulty" id="difficultyFilter" class="form-select">
+                        <option value="">All Levels</option>
+                        <option value="beginner" {% if current_difficulty == 'beginner' %}selected{% endif %}>Beginner</option>
+                        <option value="intermediate" {% if current_difficulty == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                        <option value="advanced" {% if current_difficulty == 'advanced' %}selected{% endif %}>Advanced</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-funnel"></i> Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Course Grid -->
+        {% if courses.items %}
+        <div class="row g-4 mt-2">
+            {% for course in courses.items %}
+            <div class="col-md-6 col-lg-4">
+                <div class="course-card">
+                    <div class="course-card-header">
+                        <div class="course-category-badge">{{ course.category }}</div>
+                        <span class="badge bg-{{ course.difficulty_badge_color }} difficulty-badge">
+                            {{ course.difficulty|title }}
+                        </span>
+                    </div>
+                    <div class="course-card-body">
+                        <h5 class="course-title">{{ course.title }}</h5>
+                        <p class="course-description">
+                            {{ course.short_description or course.description[:120] }}{{ '...' if (course.short_description or course.description)|length > 120 }}
+                        </p>
+                        <div class="course-meta">
+                            <span><i class="bi bi-person"></i> {{ course.instructor.full_name }}</span>
+                            <span><i class="bi bi-collection-play"></i> {{ course.total_lessons }} lessons</span>
+                        </div>
+                    </div>
+                    <div class="course-card-footer">
+                        <span class="course-enrolled">
+                            <i class="bi bi-people"></i> {{ course.total_enrolled }} enrolled
+                        </span>
+                        <a href="{{ url_for('courses.detail', course_id=course.id) }}" class="btn btn-sm btn-primary">
+                            View Course <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if courses.pages > 1 %}
+        <nav class="mt-5" aria-label="Course pagination">
+            <ul class="pagination justify-content-center">
+                {% if courses.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('main.browse', page=courses.prev_num, search=search, category=current_category, difficulty=current_difficulty) }}">
+                        <i class="bi bi-chevron-left"></i> Previous
+                    </a>
+                </li>
+                {% endif %}
+                {% for page_num in courses.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                    <li class="page-item {% if page_num == courses.page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('main.browse', page=page_num, search=search, category=current_category, difficulty=current_difficulty) }}">{{ page_num }}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                    {% endif %}
+                {% endfor %}
+                {% if courses.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('main.browse', page=courses.next_num, search=search, category=current_category, difficulty=current_difficulty) }}">
+                        Next <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-search"></i>
+            <h4>No courses found</h4>
+            <p>Try adjusting your search or filter criteria.</p>
+            <a href="{{ url_for('main.browse') }}" class="btn btn-primary">Clear Filters</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="course-detail-section">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <div class="course-detail-card">
+                    <div class="course-detail-header">
+                        <div class="d-flex gap-2 mb-3">
+                            <span class="badge bg-primary">{{ course.category }}</span>
+                            <span class="badge bg-{{ course.difficulty_badge_color }}">{{ course.difficulty|title }}</span>
+                            {% if not course.is_published %}
+                            <span class="badge bg-secondary">Draft</span>
+                            {% endif %}
+                        </div>
+                        <h1>{{ course.title }}</h1>
+                        <p class="course-instructor-info">
+                            <i class="bi bi-person-circle"></i> Created by <strong>{{ course.instructor.full_name }}</strong>
+                        </p>
+                    </div>
+
+                    <div class="course-description mt-4">
+                        <h4>About this Course</h4>
+                        <p>{{ course.description }}</p>
+                    </div>
+
+                    <!-- Lessons List -->
+                    <div class="lessons-section mt-4">
+                        <h4><i class="bi bi-collection-play"></i> Course Content ({{ course.total_lessons }} lessons)</h4>
+                        {% if course.lessons.count() > 0 %}
+                        <div class="lesson-list">
+                            {% for lesson in course.lessons.all() %}
+                            <div class="lesson-item {% if enrollment %}clickable{% endif %}">
+                                <div class="lesson-info">
+                                    <span class="lesson-number">{{ loop.index }}</span>
+                                    {% if enrollment %}
+                                    <a href="{{ url_for('courses.view_lesson', course_id=course.id, lesson_id=lesson.id) }}">
+                                        {{ lesson.title }}
+                                    </a>
+                                    {% else %}
+                                    <span>{{ lesson.title }}</span>
+                                    {% endif %}
+                                    <span class="lesson-type-badge">
+                                        <i class="bi bi-{% if lesson.lesson_type == 'video' %}play-circle{% elif lesson.lesson_type == 'hybrid' %}collection-play{% else %}file-text{% endif %}"></i>
+                                        {{ lesson.lesson_type|title }}
+                                    </span>
+                                </div>
+                                <div class="lesson-meta">
+                                    {% if lesson.duration_minutes %}
+                                    <span><i class="bi bi-clock"></i> {{ lesson.duration_minutes }} min</span>
+                                    {% endif %}
+                                    {% if enrollment %}
+                                        {% set is_completed = enrollment.lesson_progress.filter_by(lesson_id=lesson.id, completed=True).first() %}
+                                        {% if is_completed %}
+                                        <span class="text-success"><i class="bi bi-check-circle-fill"></i></span>
+                                        {% endif %}
+                                    {% else %}
+                                    <i class="bi bi-lock"></i>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No lessons have been added yet.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Quiz Section -->
+                    {% if course.quizzes.count() > 0 %}
+                    <div class="quiz-section mt-4">
+                        <h4><i class="bi bi-clipboard-check"></i> Quiz</h4>
+                        {% set quiz = course.quizzes.first() %}
+                        <div class="quiz-info-card">
+                            <p><strong>{{ quiz.title }}</strong></p>
+                            <p class="text-muted">{{ quiz.total_questions }} questions · {{ quiz.passing_score }}% to pass</p>
+                            {% if enrollment %}
+                                {% if enrollment.progress_percentage == 100 %}
+                                <a href="{{ url_for('courses.take_quiz', course_id=course.id, quiz_id=quiz.id) }}" class="btn btn-primary">
+                                    <i class="bi bi-pencil-square"></i> Take Quiz
+                                </a>
+                                {% else %}
+                                <button class="btn btn-secondary" disabled>Complete all lessons first</button>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="course-sidebar-card">
+                    <div class="sidebar-stats">
+                        <div class="sidebar-stat">
+                            <i class="bi bi-collection-play"></i>
+                            <span>{{ course.total_lessons }} lessons</span>
+                        </div>
+                        <div class="sidebar-stat">
+                            <i class="bi bi-people"></i>
+                            <span>{{ course.total_enrolled }} students enrolled</span>
+                        </div>
+                        {% if course.total_duration %}
+                        <div class="sidebar-stat">
+                            <i class="bi bi-clock"></i>
+                            <span>{{ course.total_duration }} min total</span>
+                        </div>
+                        {% endif %}
+                        <div class="sidebar-stat">
+                            <i class="bi bi-tag"></i>
+                            <span>Free</span>
+                        </div>
+                    </div>
+
+                    {% if current_user.is_authenticated %}
+                        {% if enrollment %}
+                            <!-- Progress -->
+                            <div class="enrollment-progress mt-3">
+                                <p class="mb-2"><strong>Your Progress</strong></p>
+                                <div class="progress mb-2" style="height: 10px;">
+                                    <div class="progress-bar bg-success" role="progressbar"
+                                         style="width: {{ enrollment.progress_percentage }}%"
+                                         aria-valuenow="{{ enrollment.progress_percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <p class="text-muted small">{{ enrollment.progress_percentage }}% complete ({{ enrollment.lessons_completed_count }}/{{ course.total_lessons }} lessons)</p>
+
+                                {% if enrollment.completed and enrollment.can_get_certificate %}
+                                    {% if enrollment.certificate %}
+                                    <a href="{{ url_for('certificate.view', uid=enrollment.certificate.certificate_uid) }}" class="btn btn-success w-100 mt-2">
+                                        <i class="bi bi-award"></i> View Certificate
+                                    </a>
+                                    {% else %}
+                                    <form method="POST" action="{{ url_for('certificate.generate', enrollment_id=enrollment.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-success w-100 mt-2">
+                                            <i class="bi bi-award"></i> Generate Certificate
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if course.lessons.count() > 0 %}
+                                {% set first_lesson = course.lessons.first() %}
+                                <a href="{{ url_for('courses.view_lesson', course_id=course.id, lesson_id=first_lesson.id) }}" class="btn btn-primary w-100 mt-2">
+                                    <i class="bi bi-play-circle"></i> Continue Learning
+                                </a>
+                                {% endif %}
+                            </div>
+                        {% elif current_user.is_student %}
+                            <form method="POST" action="{{ url_for('courses.enroll', course_id=course.id) }}" class="mt-3">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="bi bi-plus-circle"></i> Enroll Now — Free
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg w-100 mt-3">
+                            <i class="bi bi-box-arrow-in-right"></i> Log In to Enroll
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

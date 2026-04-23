@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="lesson-page">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar: Lesson List -->
+            <div class="col-lg-3 lesson-sidebar">
+                <div class="sidebar-header">
+                    <a href="{{ url_for('courses.detail', course_id=course.id) }}" class="btn btn-sm btn-outline-secondary mb-3">
+                        <i class="bi bi-arrow-left"></i> Back to Course
+                    </a>
+                    <h6 class="sidebar-course-title">{{ course.title }}</h6>
+                    {% if enrollment %}
+                    <div class="progress mb-3" style="height: 6px;">
+                        <div class="progress-bar bg-success" style="width: {{ enrollment.progress_percentage }}%"></div>
+                    </div>
+                    <small class="text-muted">{{ enrollment.progress_percentage }}% complete</small>
+                    {% endif %}
+                </div>
+                <div class="lesson-nav-list">
+                    {% for l in all_lessons %}
+                    <a href="{{ url_for('courses.view_lesson', course_id=course.id, lesson_id=l.id) }}"
+                       class="lesson-nav-item {% if l.id == lesson.id %}active{% endif %}">
+                        <span class="lesson-nav-number">{{ loop.index }}</span>
+                        <span class="lesson-nav-title">{{ l.title }}</span>
+                        {% if l.id in completed_lesson_ids %}
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9 lesson-content-area">
+                <div class="lesson-content-card">
+                    <div class="lesson-header">
+                        <h2>{{ lesson.title }}</h2>
+                        <div class="lesson-badges">
+                            <span class="badge bg-info">
+                                <i class="bi bi-{% if lesson.lesson_type == 'video' %}play-circle{% elif lesson.lesson_type == 'hybrid' %}collection-play{% else %}file-text{% endif %}"></i>
+                                {{ lesson.lesson_type|title }}
+                            </span>
+                            {% if lesson.duration_minutes %}
+                            <span class="badge bg-secondary"><i class="bi bi-clock"></i> {{ lesson.duration_minutes }} min</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Video Player -->
+                    {% if lesson.lesson_type in ['video', 'hybrid'] and lesson.video_url %}
+                    <div class="video-container mt-4">
+                        <iframe src="{{ lesson.youtube_embed_url }}" title="{{ lesson.title }}"
+                                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen></iframe>
+                    </div>
+                    {% endif %}
+
+                    <!-- Text Content -->
+                    {% if lesson.content %}
+                    <div class="lesson-text-content mt-4">
+                        {{ lesson.content|safe }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Mark Complete Button -->
+                    {% if enrollment %}
+                    <div class="lesson-actions mt-4">
+                        {% if lesson_progress and lesson_progress.completed %}
+                        <button class="btn btn-success" disabled>
+                            <i class="bi bi-check-circle-fill"></i> Completed
+                        </button>
+                        {% else %}
+                        <form method="POST" action="{{ url_for('courses.complete_lesson', course_id=course.id, lesson_id=lesson.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle"></i> Mark as Complete
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-7">
+                <div class="hero-content">
+                    <span class="hero-badge">
+                        <i class="bi bi-stars"></i> Free Online Courses with Certificates
+                    </span>
+                    <h1 class="hero-title">
+                        Learn Without <span class="gradient-text">Limits</span>,
+                        Grow Without <span class="gradient-text">Boundaries</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Enroll in expert-led courses, track your progress, and earn
+                        verifiable certificates — all for free on Aursikho.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="{{ url_for('main.browse') }}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-compass"></i> Explore Courses
+                        </a>
+                        {% if not current_user.is_authenticated %}
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-person-plus"></i> Join Free
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="hero-illustration">
+                    <div class="floating-card card-1">
+                        <i class="bi bi-play-circle-fill"></i>
+                        <span>Video Lessons</span>
+                    </div>
+                    <div class="floating-card card-2">
+                        <i class="bi bi-patch-check-fill"></i>
+                        <span>Get Certified</span>
+                    </div>
+                    <div class="floating-card card-3">
+                        <i class="bi bi-bar-chart-fill"></i>
+                        <span>Track Progress</span>
+                    </div>
+                    <div class="hero-circle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-book"></i></div>
+                    <div class="stat-number" data-count="{{ stats.total_courses }}">{{ stats.total_courses }}</div>
+                    <div class="stat-label">Courses</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-people"></i></div>
+                    <div class="stat-number" data-count="{{ stats.total_students }}">{{ stats.total_students }}</div>
+                    <div class="stat-label">Students</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-person-workspace"></i></div>
+                    <div class="stat-number" data-count="{{ stats.total_instructors }}">{{ stats.total_instructors }}</div>
+                    <div class="stat-label">Instructors</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-clipboard-check"></i></div>
+                    <div class="stat-number" data-count="{{ stats.total_enrollments }}">{{ stats.total_enrollments }}</div>
+                    <div class="stat-label">Enrollments</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Courses -->
+{% if courses %}
+<section class="featured-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Featured Courses</h2>
+            <p class="section-subtitle">Start learning from our latest courses</p>
+        </div>
+        <div class="row g-4">
+            {% for course in courses %}
+            <div class="col-md-6 col-lg-4">
+                <div class="course-card">
+                    <div class="course-card-header">
+                        <div class="course-category-badge">{{ course.category }}</div>
+                        <span class="badge bg-{{ course.difficulty_badge_color }} difficulty-badge">
+                            {{ course.difficulty|title }}
+                        </span>
+                    </div>
+                    <div class="course-card-body">
+                        <h5 class="course-title">{{ course.title }}</h5>
+                        <p class="course-description">
+                            {{ course.short_description or course.description[:120] }}{{ '...' if (course.short_description or course.description)|length > 120 }}
+                        </p>
+                        <div class="course-meta">
+                            <span><i class="bi bi-person"></i> {{ course.instructor.full_name }}</span>
+                            <span><i class="bi bi-collection-play"></i> {{ course.total_lessons }} lessons</span>
+                        </div>
+                    </div>
+                    <div class="course-card-footer">
+                        <span class="course-enrolled">
+                            <i class="bi bi-people"></i> {{ course.total_enrolled }} enrolled
+                        </span>
+                        <a href="{{ url_for('courses.detail', course_id=course.id) }}" class="btn btn-sm btn-primary">
+                            View Course <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-5">
+            <a href="{{ url_for('main.browse') }}" class="btn btn-outline-primary btn-lg">
+                View All Courses <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Why Aursikho?</h2>
+            <p class="section-subtitle">Everything you need for quality online learning</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-play-circle"></i>
+                    </div>
+                    <h5>Video Lessons</h5>
+                    <p>Learn at your own pace with YouTube-hosted video lessons from expert instructors.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-trophy"></i>
+                    </div>
+                    <h5>Earn Certificates</h5>
+                    <p>Complete courses, pass quizzes, and earn verifiable certificates to showcase your skills.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+                    <h5>Track Progress</h5>
+                    <p>Monitor your learning journey with lesson-by-lesson progress tracking and dashboards.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+{% if not current_user.is_authenticated %}
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-card">
+            <h2>Ready to Start Learning?</h2>
+            <p>Join Aursikho today and unlock access to free courses with certificates.</p>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg">
+                <i class="bi bi-rocket-takeoff"></i> Get Started — It's Free
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

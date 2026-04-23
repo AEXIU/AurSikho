@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="dashboard-section">
+    <div class="container">
+        <a href="{{ url_for('instructor.dashboard') }}" class="btn btn-sm btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+
+        <div class="form-card">
+            <h2>{% if is_edit %}Edit Course{% else %}Create New Course{% endif %}</h2>
+
+            <form method="POST" class="mt-4">
+                {{ form.hidden_tag() }}
+
+                <div class="mb-3">
+                    <label for="title" class="form-label">{{ form.title.label.text }}</label>
+                    {{ form.title(class="form-control", id="title", placeholder="e.g., Python for Beginners") }}
+                    {% for error in form.title.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="short_description" class="form-label">{{ form.short_description.label.text }}</label>
+                    {{ form.short_description(class="form-control", id="short_description", placeholder="Brief summary shown on course cards") }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">{{ form.description.label.text }}</label>
+                    {{ form.description(class="form-control", id="description", rows="5", placeholder="Detailed course description") }}
+                    {% for error in form.description.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="category" class="form-label">{{ form.category.label.text }}</label>
+                        {{ form.category(class="form-select", id="category") }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="difficulty" class="form-label">{{ form.difficulty.label.text }}</label>
+                        {{ form.difficulty(class="form-select", id="difficulty") }}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-check-circle"></i> {{ 'Update Course' if is_edit else 'Create Course' }}
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

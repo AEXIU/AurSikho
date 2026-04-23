@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1><i class="bi bi-info-circle"></i> About Aursikho</h1>
+        <p>Learn more about our mission and platform</p>
+    </div>
+</section>
+
+<section class="about-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="about-card">
+                    <h3>Our Mission</h3>
+                    <p>Aursikho is an online course enrollment system built to make quality education accessible to everyone. Our platform enables instructors to create engaging courses with video lessons and quizzes, while students can enroll, learn at their own pace, and earn verifiable certificates upon completion.</p>
+
+                    <h3 class="mt-4">How It Works</h3>
+                    <div class="row g-4 mt-2">
+                        <div class="col-md-4">
+                            <div class="step-card">
+                                <div class="step-number">1</div>
+                                <h5>Enroll</h5>
+                                <p>Browse courses and enroll in topics that interest you — completely free.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="step-card">
+                                <div class="step-number">2</div>
+                                <h5>Learn</h5>
+                                <p>Watch video lessons, read materials, and track your progress lesson by lesson.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="step-card">
+                                <div class="step-number">3</div>
+                                <h5>Get Certified</h5>
+                                <p>Complete all lessons, pass the quiz, and download your verifiable certificate.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="mt-5">Technology Stack</h3>
+                    <div class="tech-stack">
+                        <span class="tech-badge"><i class="bi bi-filetype-py"></i> Python</span>
+                        <span class="tech-badge"><i class="bi bi-box"></i> Flask</span>
+                        <span class="tech-badge"><i class="bi bi-database"></i> SQLite</span>
+                        <span class="tech-badge"><i class="bi bi-filetype-html"></i> Jinja2</span>
+                        <span class="tech-badge"><i class="bi bi-bootstrap"></i> Bootstrap 5</span>
+                        <span class="tech-badge"><i class="bi bi-image"></i> Pillow</span>
+                    </div>
+
+                    <h3 class="mt-5">Certificate Verification</h3>
+                    <p>Every certificate issued by Aursikho comes with a unique verification ID. Anyone can verify the authenticity of a certificate using our <a href="{{ url_for('certificate.verify_page') }}">verification page</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

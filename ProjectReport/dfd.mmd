@@ -1,0 +1,19 @@
+flowchart TD
+    S([Student]) -->|Login/Register| Auth[Authentication System]
+    I([Instructor]) -->|Login/Register| Auth
+    A([Admin]) -->|Login| Auth
+
+    S -->|Browses Course Catalog| DB[(SQLite Database)]
+    S -->|Enrolls in Course| DB
+    S -->|Views Hybrid Lessons| Media[Lesson Content Engine]
+    S -->|Submits Quiz Answers| Eval[Assessment Engine]
+    
+    Eval -->|Updates Progress/Score| DB
+    Eval -->|Issues Request| Cert[Certificate Generator]
+    Cert -->|Returns Image & UUID| S
+
+    I -->|Uploads Course Details| DB
+    I -->|Embeds YouTube URLs| Media
+    
+    A -->|Views Platform Metrics| DB
+    A -->|Manages User Roles| DB
