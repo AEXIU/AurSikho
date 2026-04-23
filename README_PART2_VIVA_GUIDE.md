@@ -1,6 +1,6 @@
-# AurSikho — Part 2: Viva & Presentation Guide
+# AurSikho — Part 2: Python Viva & Presentation Guide
 
-This guide is exclusively for you and your team (Ashish & Himanshi) to prepare for your final project submission and Viva with Prof. Khushbu Kushwaha.
+This guide is exclusively for you and your team (Ashish & Himanshi) to prepare for your final project submission and **Python Viva** with Prof. Khushbu Kushwaha.
 
 ---
 
@@ -28,34 +28,40 @@ When it's your turn to present, follow this structure to sound confident and tec
 ### The Introduction (The "Hook")
 *"Good morning Ma'am. Our project is **AurSikho**, a completely free, hybrid Online Course Enrollment System. While platforms like Udemy and Coursera exist, they often lock verifiable certificates behind massive paywalls. We built AurSikho to completely remove that barrier. It allows instructors to seamlessly create courses using both video and text, and automatically rewards students with a verifiable, dynamically generated digital certificate once they pass the final assessment."*
 
-### The Technical Walkthrough
-1. **The Architecture:** *"We built the backend using Python and the Flask framework. We didn't just write all the code in one file; we used the **App Factory Pattern** and **Blueprints** to separate our code into clean modules (Auth, Courses, Admin, Certificates). This makes our codebase highly scalable."*
-2. **The Database:** *"For our database, we are using SQLite mapped via Flask-SQLAlchemy. We designed 9 relational tables including Users, Courses, Enrollments, and Quiz Attempts, ensuring strict data integrity."*
-3. **The Highlight Feature:** *"Our most complex technical achievement is the **Certificate Engine**. We didn't use an external API. We used the Python `Pillow` (PIL) library to programmatically draw the student's name, course, and date onto a high-resolution PNG template, generating a unique UUID that makes every certificate publicly verifiable on our platform."*
+### The Technical Walkthrough (Python Focused)
+1. **The Architecture:** *"We built the backend entirely in **Python** using the Flask framework. We didn't just write all the code in one script; we used the **App Factory Pattern** and Flask **Blueprints** to organize our code into modular Python packages (Auth, Courses, Admin, Certificates)."*
+2. **The Database (ORM):** *"Instead of writing raw SQL strings, we leveraged Python's Object-Oriented nature using **Flask-SQLAlchemy**. Every table in our database is represented as a Python Class, which ensures strict data integrity and cleaner code."*
+3. **The Highlight Feature:** *"Our most complex technical achievement is the **Certificate Engine**. We used the Python `Pillow` (PIL) library to programmatically draw the student's name, course, and date onto a high-resolution PNG template, generating a unique UUID using Python's built-in `uuid` module."*
 
 ---
 
-## ❓ 3. Top Viva Questions & Answers
+## 🐍 3. Top Python-Specific Viva Questions & Answers
 
-Your external examiner or guide will likely ask technical questions to ensure you wrote the code. Here is how to answer them:
+Since this is a Python Programming Lab Viva, the examiner will heavily focus on core Python concepts, libraries, and how you utilized them. Here is how to answer them perfectly:
 
-**Q1: What architecture does your Flask app follow?**
-> **Answer:** "It follows the MVT (Model-View-Template) architecture. We used SQLAlchemy for the Models, Flask Blueprints for the Views (Routing), and Jinja2 with Bootstrap 5 for the Templates."
+**Q1: What is Flask, and why did you choose it over Django for this Python project?**
+> **Answer:** "Flask is a lightweight, 'micro' web framework written in Python. We chose it over Django because Flask is highly flexible and doesn't force a specific directory structure or ORM on us. It allowed us to hand-pick the exact Python libraries we needed, like SQLAlchemy for the database and Pillow for image generation, keeping the project modular and clean."
 
-**Q2: How did you implement security for user passwords?**
-> **Answer:** "We never store passwords in plain text. We used the `Werkzeug.security` library to hash passwords using the `PBKDF2:SHA256` encryption algorithm before saving them to the database."
+**Q2: I see you have `__init__.py` files everywhere. What is their purpose in Python?**
+> **Answer:** "In Python, the `__init__.py` file tells the Python interpreter that the directory should be treated as a Python Package. In our `app` folder, it also serves as our **App Factory**, where we initialize the Flask app instance, configure the database, and register our Blueprints."
 
-**Q3: How are you managing different user roles (Student, Instructor, Admin)?**
-> **Answer:** "We added a `role` column to our User model. We then wrote custom Python decorators (like `@instructor_required`) that wrap around our routes. If a student tries to access an instructor route, the decorator intercepts the request, blocks it, and redirects them."
+**Q3: How are you managing different user roles (Student, Instructor, Admin) in Python?**
+> **Answer:** "We used **Python Decorators**. A decorator is a function that takes another function and extends its behavior without explicitly modifying it. We wrote custom decorators like `@instructor_required` that wrap around our routes. If a student tries to access an instructor route, the decorator intercepts the request, checks their role, and blocks them."
 
-**Q4: How does the certificate generation actually work?**
-> **Answer:** "When a student passes a quiz, the system checks if their progress is 100%. If yes, we invoke the `Pillow` image library. The script loads a blank, high-resolution base template, loads TrueType fonts (like Great Vibes and Roboto), calculates the exact X/Y coordinates to center the text, draws the student's name and UUID, and saves the final PNG to our static folder."
+**Q4: How does the certificate generation actually work using Python?**
+> **Answer:** "We used the `Pillow` library, which is the modern version of the Python Imaging Library (PIL). When a student passes, the script loads a blank, high-resolution `.png` file into memory. It then loads TrueType fonts, calculates the exact X/Y coordinates to center the text dynamically, draws the student's name and UUID, and saves the final PNG to our static folder."
 
-**Q5: How are the YouTube videos playing on your site without violating CORS?**
-> **Answer:** "We don't host the massive video files on our server. Instructors simply paste a standard YouTube link. We wrote a Python property in our `Lesson` model that parses the URL and automatically converts it into a secure YouTube `<iframe>` embed link."
+**Q5: What is a Virtual Environment (`venv`), and why did you use it?**
+> **Answer:** "A virtual environment is an isolated Python environment. We used it so that all the specific dependencies for our project (like Flask 3.1, Pillow, SQLAlchemy) are installed locally in the project folder, rather than globally on the operating system. This prevents version conflicts with other Python projects."
 
-**Q6: Why did you choose SQLite instead of MySQL or MongoDB?**
-> **Answer:** "SQLite is a lightweight, serverless relational database that stores data in a single file (`aursikho.db`). Since this is a semester project, SQLite provides all the necessary relational integrity (Foreign Keys, Joins) without the overhead of configuring a separate database server. However, because we used the SQLAlchemy ORM, we could easily migrate to PostgreSQL or MySQL simply by changing one line of code in our `config.py`."
+**Q6: I see `@property` used in your database models. What does that do in Python?**
+> **Answer:** "The `@property` decorator allows us to define methods in our classes that can be accessed like attributes. For example, in our `Course` model, we wrote a method to calculate `total_duration` by summing up all lesson minutes. Because of `@property`, we can just call `course.total_duration` in our templates without using parentheses."
+
+**Q7: How did you implement security for user passwords?**
+> **Answer:** "We never store passwords in plain text. We used the `Werkzeug.security` library to hash passwords using the `PBKDF2:SHA256` encryption algorithm before saving them to the database, ensuring high-level cryptographic security."
+
+**Q8: What is an ORM, and how are you interacting with your database?**
+> **Answer:** "ORM stands for Object-Relational Mapper. We use `Flask-SQLAlchemy`. Instead of writing raw SQL queries, we define our database tables as standard Python Classes (Models). The ORM translates our Python code into SQL automatically, protecting us from SQL injection attacks and making the code highly readable."
 
 ---
-**Good luck with the Viva! You've got an amazing project to show off.**
+**Good luck with the Viva! You've got an amazing Python project to show off.**
